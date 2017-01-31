@@ -22,7 +22,6 @@ class MRNAController {
 
 //        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
 
-/n
         StatementResult result = MRNA.cypherStatic("MATCH (n)  RETURN n LIMIT 25")
 
         List<Record> statementResults = result.list()
@@ -70,13 +69,13 @@ class MRNAController {
         }
     }
 
-    def edit(MRNA MRNA) {
-        respond MRNA
+    def edit(MRNA mrna) {
+        respond mrna
     }
 
     @Transactional
-    def update(MRNA MRNA) {
-        if (MRNA == null) {
+    def update(MRNA mrna) {
+        if (mrna == null) {
             transactionStatus.setRollbackOnly()
             notFound()
             return
