@@ -2,6 +2,8 @@ package org.bbop.apollo
 
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
+import org.neo4j.driver.v1.StatementResult
+import org.neo4j.driver.v1.Record
 
 @Transactional(readOnly = true)
 class MRNAController {
@@ -10,8 +12,29 @@ class MRNAController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-//        respond MRNA.list(params), model:[MRNACount: MRNA.count()]
-        respond MRNA.list()
+//        println MRNA.count()
+////        respond MRNA.list(params), model:[MRNACount: MRNA.count()]
+//        List<MRNA> mrnaList = MRNA.list()
+//        MRNA firstMRNA = mrnaList.get(0)
+//        println firstMRNA.uniqueName
+//        println firstMRNA.name
+//        println mrnaList.size()
+
+//        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
+
+/n
+        StatementResult result = MRNA.cypherStatic("MATCH (n)  RETURN n LIMIT 25")
+
+        List<Record> statementResults = result.list()
+        println "# of results: ${statementResults.size()}"
+//        for(Record r in statementResults){
+//            println r.keys()
+//        }
+
+//        def club = Club.find("MATCH n where n.name = {1} RETURN n", 'FC Bayern Muenchen')
+
+
+        respond model:[MRNACount:MRNA.count(),dog:"cat"]
     }
 
     def show(MRNA MRNA) {

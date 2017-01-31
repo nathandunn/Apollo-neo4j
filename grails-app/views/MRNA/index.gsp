@@ -18,7 +18,9 @@
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:table collection="${MRNAList}" />
+            %{--<f:table collection="${MRNAList}" />--}%
+
+            SIZE: [${model.MRNACount}, ${model.dog}]
 
             <div class="pagination">
                 <g:paginate total="${MRNACount ?: 0}" />
