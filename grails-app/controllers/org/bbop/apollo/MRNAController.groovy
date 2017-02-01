@@ -21,11 +21,26 @@ class MRNAController {
 //        println mrnaList.size()
 
 //        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
+        List<Long> queryTimes = new ArrayList<Long>()
+        List<Long> retrievalTimes = new ArrayList<Long>()
+        for(int i = 0 ; i < 10 ; i++){
+            long startTime = System.currentTimeMillis()
+            String query = "MATCH (n:MRNA {name:'Group2.19h-00001'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'Group2.19h-00001'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25"
+//            StatementResult result = MRNA.cypherStatic("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
+            StatementResult result = MRNA.cypherStatic(query)
+            long stopTime = System.currentTimeMillis()
+            queryTimes.add(stopTime - startTime)
+            startTime = System.currentTimeMillis()
+            List<Record> statementResults = result.list()
+            stopTime = System.currentTimeMillis()
+            retrievalTimes.add(stopTime - startTime)
+            println "# of results: ${statementResults.size()}"
+        }
+        Double avgQueryTime = queryTimes.sum() / queryTimes.size()
+        println "avg query time ${avgQueryTime}"
+        Double avgRetrievalTime = retrievalTimes.sum() / retrievalTimes.size()
+        println "avg retrieval time ${avgRetrievalTime}"
 
-        StatementResult result = MRNA.cypherStatic("MATCH (n)  RETURN n LIMIT 25")
-
-        List<Record> statementResults = result.list()
-        println "# of results: ${statementResults.size()}"
 //        for(Record r in statementResults){
 //            println r.keys()
 //        }
