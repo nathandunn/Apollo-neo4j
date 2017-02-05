@@ -1,4 +1,4 @@
-id:ID,version,date_created,dbxref_id,description,is_analysis,is_obsolete,last_updated,md5checksum,name,sequence_length,status_id,symbol,unique_name,class:LABEL,alternate_cv_term,class_name,custom_alternate_cv_term,custom_class_name,custom_cv_term,custom_ontology_id,cv_term,meta_data,ontology_id,analysis_feature_id,alteration_residue,deletion_length
+__id__:ID,version,date_created,dbxref_id,description,is_analysis,is_obsolete,last_updated,md5checksum,name,sequence_length,status_id,symbol,unique_name,class:LABEL,alternate_cv_term,class_name,custom_alternate_cv_term,custom_class_name,custom_cv_term,custom_ontology_id,cv_term,meta_data,ontology_id,analysis_feature_id,alteration_residue,deletion_length
 8648,1,2016-11-30 17:14:00.941,,,f,f,2016-11-30 17:14:01.45,,YAL001C-00001,,,,e2a210b2-1370-4e1f-9bea-0e74d88cb88a,MRNA,,,,,,,,,,,,
 8650,1,2016-11-30 17:14:00.914,,,f,f,2016-11-30 17:14:01.451,,2a1d17c4-409a-46b5-b3d0-d9fd5e96ace8-exon,,,,074fa654-7049-4151-8133-65514ab702f9,Exon,,,,,,,,,,,,
 8653,1,2016-11-30 17:14:00.933,,,f,f,2016-11-30 17:14:01.452,,c11ad73c-a9ae-4146-828b-a2b4521497f6-CDS,,,,5b44a32c-e8b1-42c4-9655-9b1ee932a894,CDS,,,,,,,,,,,,

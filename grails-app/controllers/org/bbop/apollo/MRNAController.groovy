@@ -70,7 +70,7 @@ class MRNAController {
     }
 
     def getOne() {
-        respond MRNA.findByName("Group2.19h-00001"), view: 'show'
+        respond MRNA.first(), view: 'show'
     }
 
     def show(MRNA mrna) {
