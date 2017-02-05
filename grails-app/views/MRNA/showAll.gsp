@@ -18,23 +18,24 @@
     </ul>
 </div>
 
-<div id="list-MRNA" class="content scaffold-list" role="main">
+<h2 id="list-MRNA" class="content scaffold-list" role="main">
     <h1><g:message code="default.list.label" args="[entityName]"/></h1>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <div class="col-sm-offset-1">
+    <h2 class="col-sm-offset-1 header">
         Elapsed ${model.time} ms
-    </div>
+        SIZE: [${model.MRNACount}]
+    </h2>
     <ul class="col-sm-offset-1">
         <g:each in="${model.results}" var="record">
         %{--${record}--}%
             <li>Entry
-                <ul class="col-sm-offset-2">
+                <ul class="col-sm-offset-1">
                     <g:each in="${record}" var="inner">
                         <li>
                             ${inner.key} -> ${inner.value}
-                            <ul>
+                            <ul class="col-sm-offset-1">
                                 <g:each in="${inner.value.asMap()}" var="inval">
                                     <li>${inval.key} -> ${inval.value}</li>
                                 </g:each>

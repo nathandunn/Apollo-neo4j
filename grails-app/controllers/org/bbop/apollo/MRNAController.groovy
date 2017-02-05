@@ -13,12 +13,13 @@ class MRNAController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def showAll(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 10, 1000000000)
         String sequenceName = params.sequenceName ?: "Group2.19"
+        String featureName = params.featureName ?: "*"
 
         long startTime = System.currentTimeMillis()
 
-        String query = "MATCH (n:MRNA)-[o:FEATURE_LOCATION]-(q:SEQUENCE {name:'${sequenceName}'}),(n:MRNA)-[:RELATIONSHIP]-(p) RETURN n,p,q,o LIMIT ${params.max}"
+        String query = "MATCH (n:MRNA )-[o:FEATURE_LOCATION]-(q:SEQUENCE {name:'${sequenceName}'}),(n:MRNA)-[r:RELATIONSHIP]-(p) RETURN n,p,q,o LIMIT ${params.max}"
         StatementResult result = MRNA.cypherStatic(query)
 
         List<Map> resultList = new ArrayList<>()
