@@ -1,5 +1,7 @@
 package org.bbop.apollo
 
+import org.neo4j.driver.internal.InternalNode
+
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.neo4j.driver.v1.StatementResult
@@ -10,15 +12,29 @@ class MRNAController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def showAll(Integer max){
+        params.max = Math.min(max ?: 10, 100)
+        String sequenceName = params.sequenceName ?: "Group2.19"
+
+        long startTime = System.currentTimeMillis()
+
+        String query = "MATCH (n:MRNA)-[o:FEATURE_LOCATION]-(q:SEQUENCE {name:'${sequenceName}'}),(n:MRNA)-[:RELATIONSHIP]-(p) RETURN n,p,q,o LIMIT ${params.max}"
+        StatementResult result = MRNA.cypherStatic(query)
+
+        List<Map> resultList = new ArrayList<>()
+
+        while(result.hasNext()){
+            Record record = result.next()
+            resultList.add(record.asMap())
+        }
+        long stopTime = System.currentTimeMillis()
+
+        respond model:[results:resultList,MRNACount:resultList.size(),time:(stopTime-startTime)]
+
+    }
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-//        println MRNA.count()
-////        respond MRNA.list(params), model:[MRNACount: MRNA.count()]
-//        List<MRNA> mrnaList = MRNA.list()
-//        MRNA firstMRNA = mrnaList.get(0)
-//        println firstMRNA.uniqueName
-//        println firstMRNA.name
-//        println mrnaList.size()
 
 //        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
         List<Long> queryTimes = new ArrayList<Long>()
@@ -26,7 +42,7 @@ class MRNAController {
         for(int i = 0 ; i < 10 ; i++){
             long startTime = System.currentTimeMillis()
 //            String query = "MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25"
-            String query = "MATCH (n:MRNA {name:'Group2.19h-00001'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'Group2.19h-00001'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25"
+            String query = "MATCH (n:MRNA {name:'Group2.19h-00001'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'Group2.19h-00001'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT ${params.max}"
 //            StatementResult result = MRNA.cypherStatic("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
             StatementResult result = MRNA.cypherStatic(query)
             long stopTime = System.currentTimeMillis()
