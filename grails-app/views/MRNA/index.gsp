@@ -20,7 +20,7 @@
             </g:if>
             <f:table collection="${MRNAList}" />
 
-            SIZE: [${model.MRNACount}, ${model.dog}]
+            %{--SIZE: [${model.MRNACount}, ${model.dog}]--}%
 
             <div class="pagination">
                 <g:paginate total="${MRNACount ?: 0}" />

@@ -19,6 +19,8 @@
             <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
             </g:if>
+            %{--${MRNA.name}--}%
+            %{--${MRNA.isObsolete}--}%
             <f:display bean="MRNA" />
             <g:form resource="${this.MRNA}" method="DELETE">
                 <fieldset class="buttons">

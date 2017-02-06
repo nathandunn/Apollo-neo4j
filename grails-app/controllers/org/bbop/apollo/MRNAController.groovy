@@ -35,7 +35,7 @@ class MRNAController {
     }
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 10, 1000000)
 
 //        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
         List<Long> queryTimes = new ArrayList<Long>()
@@ -66,12 +66,15 @@ class MRNAController {
 //        def club = Club.find("MATCH n where n.name = {1} RETURN n", 'FC Bayern Muenchen')
 
 
-        respond model:[MRNACount:MRNA.count(),dog:"cat"]
+//        respond model:[MRNACount:MRNA.count(),dog:"cat"]
+        respond MRNA.list(params), model:[MRNACount: MRNA.count()]
     }
 
     def one() {
         println "count: "+ MRNA.countByName("YAL001C-00001")
         MRNA mrna = MRNA.findByName("YAL001C-00001")
+        println "properties: ${mrna.properties}"
+        println "dateCreated: ${mrna.date_created}"
         respond mrna, view: 'one'
     }
 

@@ -22,7 +22,7 @@ class MRNA {
 //    Date lastUpdated
 //    String uniqueName
 //    Date dateCreated
-    String name
+//    String name
 //    String id
 //    Long version
 //    Boolean isObsolete
@@ -30,9 +30,9 @@ class MRNA {
 
 //    Boolean is_analysis
 //    Date last_updated
-//    String unique_name
+    String unique_name
 //    Date date_created
-//    String name
+    String name
 //    Long id
 //    Long version
 //    Boolean is_obsolete
