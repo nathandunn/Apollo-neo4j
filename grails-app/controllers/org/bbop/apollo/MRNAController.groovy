@@ -69,8 +69,10 @@ class MRNAController {
         respond model:[MRNACount:MRNA.count(),dog:"cat"]
     }
 
-    def getOne() {
-        respond MRNA.first(), view: 'show'
+    def one() {
+        println "count: "+ MRNA.countByName("YAL001C-00001")
+        MRNA mrna = MRNA.findByName("YAL001C-00001")
+        respond mrna, view: 'one'
     }
 
     def show(MRNA mrna) {
