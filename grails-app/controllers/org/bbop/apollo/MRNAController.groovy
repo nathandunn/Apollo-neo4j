@@ -34,10 +34,7 @@ class MRNAController {
 
     }
 
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 1000000)
-
-//        def stuff = MRNA.findAll("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
+    def measureRetrieval(Integer max){
         List<Long> queryTimes = new ArrayList<Long>()
         List<Long> retrievalTimes = new ArrayList<Long>()
         for(int i = 0 ; i < 10 ; i++){
@@ -59,15 +56,17 @@ class MRNAController {
         Double avgRetrievalTime = retrievalTimes.sum() / retrievalTimes.size()
         println "avg retrieval time ${avgRetrievalTime}"
 
-//        for(Record r in statementResults){
-//            println r.keys()
-//        }
+        respond MRNA.list(params), model:[MRNACount: MRNA.count()], view: "index"
+    }
 
-//        def club = Club.find("MATCH n where n.name = {1} RETURN n", 'FC Bayern Muenchen')
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 1000000)
+//        def mrnas = params.name ?  MRNA.findAllByName("YAL023C-00001",params): MRNA.list(params)
+//        println "mrnas: ${mrnas.size()}"
 
+        def mrnas = MRNA.list(params)
 
-//        respond model:[MRNACount:MRNA.count(),dog:"cat"]
-        respond MRNA.list(params), model:[MRNACount: MRNA.count()]
+        respond mrnas, model:[MRNACount: MRNA.count()]
     }
 
     def one() {
@@ -87,27 +86,27 @@ class MRNAController {
     }
 
     @Transactional
-    def save(MRNA MRNA) {
-        if (MRNA == null) {
+    def save(MRNA mrna) {
+        if (mrna == null) {
             transactionStatus.setRollbackOnly()
             notFound()
             return
         }
 
-        if (MRNA.hasErrors()) {
+        if (mrna.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond MRNA.errors, view:'create'
+            respond mrna.errors, view:'create'
             return
         }
 
-        MRNA.save flush:true
+        mrna.save flush:true
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'MRNA.label', default: 'MRNA'), MRNA.id])
-                redirect MRNA
+                flash.message = message(code: 'default.created.message', args: [message(code: 'MRNA.label', default: 'MRNA'), mrna.id])
+                redirect mrna
             }
-            '*' { respond MRNA, [status: CREATED] }
+            '*' { respond mrna, [status: CREATED] }
         }
     }
 
@@ -123,37 +122,38 @@ class MRNAController {
             return
         }
 
-        if (MRNA.hasErrors()) {
+        if (mrna.hasErrors()) {
             transactionStatus.setRollbackOnly()
             respond MRNA.errors, view:'edit'
             return
         }
 
-        MRNA.save flush:true
+//        mrna.save flush:true
+        mrna.save
 
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'MRNA.label', default: 'MRNA'), MRNA.id])
-                redirect MRNA
+                redirect mrna
             }
-            '*'{ respond MRNA, [status: OK] }
+            '*'{ respond mrna, [status: OK] }
         }
     }
 
     @Transactional
-    def delete(MRNA MRNA) {
+    def delete(MRNA mrna) {
 
-        if (MRNA == null) {
+        if (mrna == null) {
             transactionStatus.setRollbackOnly()
             notFound()
             return
         }
 
-        MRNA.delete flush:true
+        mrna.delete flush:true
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'MRNA.label', default: 'MRNA'), MRNA.id])
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'mrna.label', default: 'mrna'), mrna.id])
                 redirect action:"index", method:"GET"
             }
             '*'{ render status: NO_CONTENT }
