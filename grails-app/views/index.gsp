@@ -70,6 +70,10 @@
                             <g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link>
                         </li>
                     </g:each>
+                    <li><a href="http://localhost:8080/MRNA/showAll?sequenceName=Group1.10&max=10000">Show All</a></li>
+                    %{--<li><a href="http://localhost:8080/MRNA/measureRetrieval">Measure Bulk Synchronous Retrieval</a></li>--}%
+                    <li><a href="http://localhost:8080/MRNA/measureRetrieval?featureName=Group4.13x-00001&max=100">Measure Synchronous For a Feature</a></li>
+                    <li><a href="http://localhost:8080/MRNA/measureRetrievalAsync?featureName=Group4.13x-00001&max=100">Measure Asynchronous Synchronous Retrieval</a></li>
                 </ul>
             </div>
         </section>

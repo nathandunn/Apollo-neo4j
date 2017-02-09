@@ -18,6 +18,11 @@
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
+            <ul>
+                <li>Total avg time (ms): ${avgTime}</li>
+                <li>Total avg query time (ms): ${avgQueryTime}</li>
+                <li>Feature Name: ${featureName}</li>
+            </ul>
             <f:table collection="${MRNAList}" />
 
             %{--SIZE: [${model.MRNACount}, ${model.dog}]--}%

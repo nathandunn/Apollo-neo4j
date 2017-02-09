@@ -1,18 +1,18 @@
 package org.bbop.apollo
 
-import org.neo4j.driver.internal.InternalNode
+import grails.async.PromiseList
+import grails.transaction.Transactional
+import org.neo4j.driver.v1.Record
+import org.neo4j.driver.v1.StatementResult
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
-import org.neo4j.driver.v1.StatementResult
-import org.neo4j.driver.v1.Record
 
 @Transactional(readOnly = true)
 class MRNAController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def showAll(Integer max){
+    def showAll(Integer max) {
         params.max = Math.min(max ?: 10, 1000000000)
         String sequenceName = params.sequenceName ?: "Group2.19"
         String featureName = params.featureName ?: "*"
@@ -24,24 +24,59 @@ class MRNAController {
 
         List<Map> resultList = new ArrayList<>()
 
-        while(result.hasNext()){
+        while (result.hasNext()) {
             Record record = result.next()
             resultList.add(record.asMap())
         }
         long stopTime = System.currentTimeMillis()
 
-        respond model:[results:resultList,MRNACount:resultList.size(),time:(stopTime-startTime)]
+        respond model: [results: resultList, MRNACount: resultList.size(), time: (stopTime - startTime)]
 
     }
 
-    def measureRetrieval(Integer max){
+    def measureRetrievalAsync(Integer max) {
+
+        String featureName = params.featureName ?: "Group2.19h-00001"
+        Integer concurrent = (params.concurrent ?: 10) as Integer
+        params.max = Math.min(max ?: 10, 1000000)
+
+        long startTime = System.currentTimeMillis()
+
+        int numResults = 0
+        long queryTime = 0
+        long totalTime = 0
+
+        def list = new PromiseList()
+
+        Long avgQueryTime = 0l
+        Long avgRetrievalTime = 0l
+        List promiseList = []
+
+//        MRNA.async.findAllByName(featureName).onComplete() { List results ->
+//            numResults += results.size()
+//        }
+
+        def results = MRNA.findAllByName(featureName)
+        numResults += results.size()
+
+        println "# of results: ${numResults}"
+
+        long stopTime = System.currentTimeMillis()
+        println "Avg retrieval time ${stopTime - startTime} for ${numResults} results and ${concurrent} concurrency."
+
+        respond MRNA.list(params), model: [MRNACount: MRNA.count(), avgTime: stopTime - startTime, avgQueryTime: avgQueryTime, featureName: featureName], view: "index"
+    }
+
+    def measureRetrieval(Integer max) {
         List<Long> queryTimes = new ArrayList<Long>()
         List<Long> retrievalTimes = new ArrayList<Long>()
-        for(int i = 0 ; i < 10 ; i++){
+        params.max = Math.min(max ?: 10, 1000000)
+
+        String featureName = params.featureName ?: "Group2.19h-00001"
+
+        for (int i = 0; i < 10; i++) {
             long startTime = System.currentTimeMillis()
-//            String query = "MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25"
-            String query = "MATCH (n:MRNA {name:'Group2.19h-00001'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'Group2.19h-00001'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT ${params.max}"
-//            StatementResult result = MRNA.cypherStatic("MATCH (n:MRNA {name:'YAL022C-00002'})-[:FEATURE_LOCATION]-(q:SEQUENCE {organism_id:'16326'}),(n:MRNA {name:'YAL022C-00002'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT 25")
+            String query = "MATCH (n:MRNA {name:'${featureName}'})-[:FEATURE_LOCATION]-(q:SEQUENCE),(n:MRNA {name:'${featureName}'})-[:RELATIONSHIP]-(p) RETURN n,p,q LIMIT ${params.max}"
             StatementResult result = MRNA.cypherStatic(query)
             long stopTime = System.currentTimeMillis()
             queryTimes.add(stopTime - startTime)
@@ -56,7 +91,7 @@ class MRNAController {
         Double avgRetrievalTime = retrievalTimes.sum() / retrievalTimes.size()
         println "avg retrieval time ${avgRetrievalTime}"
 
-        respond MRNA.list(params), model:[MRNACount: MRNA.count()], view: "index"
+        respond MRNA.list(params), model: [MRNACount: MRNA.count(), avgTime: avgRetrievalTime, avgQueryTime: avgQueryTime, featureName: featureName], view: "index"
     }
 
     def index(Integer max) {
@@ -66,11 +101,11 @@ class MRNAController {
 
         def mrnas = MRNA.list(params)
 
-        respond mrnas, model:[MRNACount: MRNA.count()]
+        respond mrnas, model: [MRNACount: MRNA.count()]
     }
 
     def one() {
-        println "count: "+ MRNA.countByName("YAL001C-00001")
+        println "count: " + MRNA.countByName("YAL001C-00001")
         MRNA mrna = MRNA.findByName("YAL001C-00001")
         println "properties: ${mrna.properties}"
         println "dateCreated: ${mrna.date_created}"
@@ -95,11 +130,11 @@ class MRNAController {
 
         if (mrna.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond mrna.errors, view:'create'
+            respond mrna.errors, view: 'create'
             return
         }
 
-        mrna.save flush:true
+        mrna.save flush: true
 
         request.withFormat {
             form multipartForm {
@@ -124,7 +159,7 @@ class MRNAController {
 
         if (mrna.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond MRNA.errors, view:'edit'
+            respond MRNA.errors, view: 'edit'
             return
         }
 
@@ -136,7 +171,7 @@ class MRNAController {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'MRNA.label', default: 'MRNA'), MRNA.id])
                 redirect mrna
             }
-            '*'{ respond mrna, [status: OK] }
+            '*' { respond mrna, [status: OK] }
         }
     }
 
@@ -149,14 +184,14 @@ class MRNAController {
             return
         }
 
-        mrna.delete flush:true
+        mrna.delete flush: true
 
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'mrna.label', default: 'mrna'), mrna.id])
-                redirect action:"index", method:"GET"
+                redirect action: "index", method: "GET"
             }
-            '*'{ render status: NO_CONTENT }
+            '*' { render status: NO_CONTENT }
         }
     }
 
@@ -166,7 +201,7 @@ class MRNAController {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'MRNA.label', default: 'MRNA'), params.id])
                 redirect action: "index", method: "GET"
             }
-            '*'{ render status: NOT_FOUND }
+            '*' { render status: NOT_FOUND }
         }
     }
 }
