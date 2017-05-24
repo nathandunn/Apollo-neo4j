@@ -1,5 +1,5 @@
-# grails-graph-test
-test gorm with neo4j + grails
+# Apollo Neo4j
+Testing Apollo with Neo4j + Grails3
 
 Just an experiment to assess rough performance of join versus a cypher query.
 
